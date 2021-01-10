@@ -32,10 +32,10 @@ const (
 	ddgImagesResulCount int = 100
 )
 
-// DownloadImages function downloads `count` images from duckduckgo images
-// and writes them to disk under the {./`query`} folder, return a list of
-// physical paths to the downloaded images.
-func DownloadImages(query string, count int) ([]string, error) {
+// DownloadImages downloads requested number of images from the duckduckgo
+// images and writes them to disk under the `./<query>}` folder, returns a
+// list of physical paths to the downloaded images.
+func DownloadImages(query string, numberOfImages int) ([]string, error) {
 	// Get the current path
 	currentDir, osErr := os.Getwd()
 	if osErr != nil {
@@ -52,8 +52,8 @@ func DownloadImages(query string, count int) ([]string, error) {
 	var downloadedFilePaths []string = make([]string, 0)
 	startOffset := 0
 	commonImageExtension := []string{".jpg", ".jpeg", ".gif", ".png", ".bmp", ".svg", ".webp", ".ico"}
-	// Keep crawling unless the given count number is met
-	for len(downloadedFilePaths) < count {
+	// Keep crawling unless the requested image number is met
+	for len(downloadedFilePaths) < numberOfImages {
 		currentImages, crawlErr := GetImageURLs(query, startOffset)
 		if crawlErr != nil {
 			return nil, crawlErr
@@ -84,7 +84,7 @@ func DownloadImages(query string, count int) ([]string, error) {
 
 			downloadedFilePaths = append(downloadedFilePaths, targetFilePath)
 
-			if len(downloadedFilePaths) >= count {
+			if len(downloadedFilePaths) >= numberOfImages {
 				break
 			}
 		}
@@ -94,11 +94,11 @@ func DownloadImages(query string, count int) ([]string, error) {
 	return downloadedFilePaths, nil
 }
 
-// GetImageURLs crawls duckduckgo images and returns 100 images related to the `query`
-// starting at `start` index. The `start` parameter indicates the first
+// GetImageURLs crawls duckduckgo images and returns 100 image URLs related to the `query`
+// starting at the given `start` index. The `start` parameter indicates the first
 // image's index at the results page.
-// e.g. if `start`is set to 15, the function will ignore first 15 images
-// and fetch images with indexes [15, 115]
+// e.g. if `start` is set to 15, the function will ignore first 15 image results
+// and fetch images at indexes [15, 115]
 func GetImageURLs(query string, start int) (*[]Image, error) {
 
 	urlEncodedQuery := url.QueryEscape(query)
@@ -134,7 +134,7 @@ func GetImageURLs(query string, start int) (*[]Image, error) {
 
 	// Construct images from json string
 	var images images
-	json.Unmarshal([]byte(string(body)), &images)
+	json.Unmarshal(body, &images)
 	return &images.Images, nil
 }
 
