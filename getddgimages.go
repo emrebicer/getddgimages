@@ -44,7 +44,7 @@ func DownloadImages(query string, numberOfImages int) ([]string, error) {
 
 	// Create the target dir
 	targetDir := filepath.Join(currentDir, url.QueryEscape(query))
-	mkdirErr := os.Mkdir(targetDir, 0666)
+	mkdirErr := os.Mkdir(targetDir, 0744)
 	if mkdirErr != nil {
 		return nil, mkdirErr
 	}
@@ -162,5 +162,5 @@ func getImageFromURL(url string) (*[]byte, error) {
 }
 
 func writeImageToDisk(image []byte, path string) error {
-	return ioutil.WriteFile(path, image, 0666)
+	return ioutil.WriteFile(path, image, 0744)
 }
